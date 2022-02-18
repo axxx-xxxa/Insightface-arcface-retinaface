@@ -19,7 +19,8 @@ code : ibh2
 1. find the build folder in subfolder
 2. delete build first (delete my exe and build yours)
 3. mkdir build && cd build
-4. ./{exe} -d
+4. make
+5. ./{exe} -d
 
 tips:  Following examples described how to get engine file by onnx or pytorch(wts)
 ```
