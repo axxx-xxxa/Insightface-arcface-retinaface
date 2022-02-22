@@ -1,9 +1,5 @@
 # Insightface/Arcface/Retinaface
 
-[TOC]
-
-
-
 ### Requirement
 
 Tensorrt 8.x
@@ -145,19 +141,11 @@ sudo ./arcface-mobilefacenet -d   // deserialize plan file and run inference
 
 
 
-![image-20220218100730719](C:\Users\qys\AppData\Roaming\Typora\typora-user-images\image-20220218100730719.png)
+![image-20220218100730719](C:\Users\qys\AppData\Roaming\Typora\typora-user-images\image-20220218100730719.png
 
 #### convert to trt
 
-Trtexec：
 
-[Developer Guide :: NVIDIA Deep Learning TensorRT Documentation](#work_dynamic_shapes)
-
-[TensorRT/samples/trtexec at main · NVIDIA/TensorRT · GitHub](https://github.com/NVIDIA/TensorRT/tree/main/samples/trtexec)
-
-Insightface:
-
-[GitHub - deepinsight/insightface: State-of-the-art 2D and 3D Face Analysis Project](https://github.com/deepinsight/insightface)
 
 ```
 1.cd /usr/src/tensorrt/samples/trtexec 
@@ -198,4 +186,14 @@ make
 ./my_trt_infer -d
 ```
 
-### 
+### Trtexec
+
+Trtexec：
+
+[Developer Guide :: NVIDIA Deep Learning TensorRT Documentation](#work_dynamic_shapes)
+
+[TensorRT/samples/trtexec at main · NVIDIA/TensorRT · GitHub](https://github.com/NVIDIA/TensorRT/tree/main/samples/trtexec)
+
+Insightface:
+
+[GitHub - deepinsight/insightface: State-of-the-art 2D and 3D Face Analysis Project](https://github.com/deepinsight/insightface) 
