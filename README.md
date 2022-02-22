@@ -35,7 +35,7 @@ Codes are based on Python 3
 
 convert tool
 
-url:[[tensorrtx/retinaface at master · wang-xinyu/tensorrtx (github.com)](https://github.com/wang-xinyu/tensorrtx/tree/master/retinaface)](https://github.com/wang-xinyu/tensorrtx/blob/master/retinaface/retina_r50.cpp)
+url:[[tensorrtx/retinaface at master · wang-xinyu/tensorrtx (github.com)](https://github.com/wang-xinyu/tensorrtx/tree/master/retinaface)]
 
 convert command line
 
@@ -141,7 +141,6 @@ sudo ./arcface-mobilefacenet -d   // deserialize plan file and run inference
 
 
 
-![image-20220218100730719](C:\Users\qys\AppData\Roaming\Typora\typora-user-images\image-20220218100730719.png
 
 #### convert to trt
 
@@ -186,7 +185,7 @@ make
 ./my_trt_infer -d
 ```
 
-### Trtexec
+## Trtexec
 
 Trtexec：
 
