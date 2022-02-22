@@ -1,8 +1,12 @@
 # Insightface/Arcface/Retinaface
 
+
+
 ### Requirement
 
-Tensorrt 8.x
+jetson nano/tx2/xavierAGX
+
+jetpack( Tensorrt 8.x)
 
 Codes are based on Python 3
 
@@ -22,7 +26,7 @@ Codes are based on Python 3
 
 
 
-## Retinaface
+## Retinaface Trail
 
 ### Model
 
@@ -31,11 +35,17 @@ Codes are based on Python 3
 链接：https://pan.baidu.com/s/19ZXRB6WQGW2NuXuCycePxA 
 提取码：24dt
 
+pth model is based on RetinaFace in PyTorch:
+
+[wang-xinyu/Pytorch_Retinaface: Retinaface get 80.99% in widerface hard val using mobilenet0.25. (github.com)](https://github.com/wang-xinyu/Pytorch_Retinaface)
+
+
+
 ####  convert to trt
 
 convert tool
 
-url:[[tensorrtx/retinaface at master · wang-xinyu/tensorrtx (github.com)](https://github.com/wang-xinyu/tensorrtx/tree/master/retinaface)]
+url:[[tensorrtx/retinaface at master · wang-xinyu/tensorrtx (github.com)](https://github.com/wang-xinyu/tensorrtx/tree/master/retinaface)](https://github.com/wang-xinyu/tensorrtx/blob/master/retinaface/retina_r50.cpp)
 
 convert command line
 
@@ -67,7 +77,7 @@ sudo ./retina_r50 -d  // deserialize model file and run inference.
 
 
 
-## Arcface
+## Arcface Trail
 
 ### Model
 
@@ -75,6 +85,10 @@ sudo ./retina_r50 -d  // deserialize model file and run inference.
 
 链接：https://pan.baidu.com/s/1QVqUO3VTFsWimgUzBLUgGA 
 提取码：fta5
+
+pth model is based on mxnet implementation of pretrained model:
+
+**Please check [Model-Zoo](https://github.com/deepinsight/insightface/wiki/Model-Zoo) for more pretrained models.**
 
 ####  convert to trt
 
@@ -130,7 +144,7 @@ sudo ./arcface-mobilefacenet -d   // deserialize plan file and run inference
 
 
 
-## Insightface
+## Insightface Trail
 
 ### Model
 
@@ -139,6 +153,9 @@ sudo ./arcface-mobilefacenet -d   // deserialize plan file and run inference
 链接：https://pan.baidu.com/s/1bL4Dqb85Y9Mg6SDxPd1V3w 
 提取码：enkm
 
+onnx models are based on Insightface Pretrained Models
+
+**Please check [Model-Zoo](https://github.com/deepinsight/insightface/wiki/Model-Zoo) for more pretrained models.**
 
 
 
@@ -185,7 +202,7 @@ make
 ./my_trt_infer -d
 ```
 
-## Trtexec
+### Trtexec
 
 Trtexec：
 
