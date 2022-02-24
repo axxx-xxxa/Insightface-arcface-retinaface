@@ -1,4 +1,6 @@
-# Insightface/Arcface/Retinaface
+# Retinaface /Arcface 
+
+基于retinaface/arcface在边缘设备实现实时人脸检测与识别
 
 
 
@@ -16,13 +18,13 @@ Codes are based on Python 3
 | :------------ | ---- | ---- |
 | r50(pth->trt) | 10ms | 70ms |
 
-| Retinaface    | AGX  | Nano  |
-| ------------- | ---- | ----- |
-| r50(pth->trt) | 17ms | 190ms |
+| Retinaface(pth) | AGX  | Nano  |
+| --------------- | ---- | ----- |
+| r50(pth->trt)   | 17ms | 190ms |
 
-| insightface(detect) | AGX  | Nano |
-| ------------------- | ---- | ---- |
-| r50(onnx->trt)      | 9ms  | 65ms |
+| Retinaface (onnx) | AGX  | Nano |
+| ----------------- | ---- | ---- |
+| r50(onnx->trt)    | 9ms  | 65ms |
 
 
 
@@ -144,7 +146,7 @@ sudo ./arcface-mobilefacenet -d   // deserialize plan file and run inference
 
 
 
-## Insightface Trail
+## Onnx dynamic model to Engine Trail
 
 ### Model
 
@@ -190,17 +192,9 @@ onnx models are based on Insightface Pretrained Models
     --buildonly
 
 
-3.Copy .engine files to {Insightface}/{models} fold
 ```
 
-### Infer
 
-```
-cd {Insightface}
-mkdir build && cd build
-make
-./my_trt_infer -d
-```
 
 ### Trtexec
 
@@ -213,3 +207,42 @@ Trtexec：
 Insightface:
 
 [GitHub - deepinsight/insightface: State-of-the-art 2D and 3D Face Analysis Project](https://github.com/deepinsight/insightface) 
+
+
+
+## Retinaface+Arcface Trail 
+
+(jetson AGX xavier实现)
+
+本程序将company_faces中人脸图片作为源数据，与rtsp流中检测到的人脸对比，若相似度大于阈值，会在人脸上标注名称（英文缩写）。
+
+### Source code
+
+链接：https://pan.baidu.com/s/1M2GTxXNbg_-vODOa2HYajg 
+提取码：fjc7
+
+### Model
+
+arcface-mobilefacenet.engine 由 arcface-m.wts(mobilenet) 转换
+
+retina_mnet.engine 由 retina-m.wts(mobilenet) 转换
+
+### Run
+
+1. download baidu cloud link files and unzip "b2b"
+
+2. 
+
+   ```
+   cd b2b 
+   mkdir build && cd build
+   mkdir company_faces (将本地人脸图片放入该路径下)
+   make
+   (company_faces目录写死，目录中人脸图片请以qys0.jpg,yx_0.jpg格式命名，仅支持0-9) 
+   (rtsp已经写死，需要到b2b.cpp里video_cap函数中修改)
+   ```
+
+3. 将arcface-mobilefacenet.engine及retina_mnet.engine放到build目录下
+
+4. ./b2b -d
+
