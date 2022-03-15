@@ -14,17 +14,17 @@ Codes are based on Python 3
 
 ### Performance
 
-| Arcface       | AGX  | Nano |
-| :------------ | ---- | ---- |
-| r50(pth->trt) | 10ms | 70ms |
+| Arcface（pth） | AGX  | Nano |
+| :------------- | ---- | ---- |
+| r50(pth->trt)  | 10ms | 70ms |
 
-| Retinaface(pth) | AGX  | Nano  |
-| --------------- | ---- | ----- |
-| r50(pth->trt)   | 17ms | 190ms |
+| Retinaface（pth） | AGX  | Nano  |
+| ----------------- | ---- | ----- |
+| r50(pth->trt)     | 17ms | 190ms |
 
-| Retinaface (onnx) | AGX  | Nano |
-| ----------------- | ---- | ---- |
-| r50(onnx->trt)    | 9ms  | 65ms |
+| Arcface（onnx） | AGX  | Nano |
+| --------------- | ---- | ---- |
+| r50(onnx->trt)  | 9ms  | 65ms |
 
 
 
@@ -227,9 +227,103 @@ arcface-mobilefacenet.engine 由 arcface-m.wts(mobilenet) 转换
 
 retina_mnet.engine 由 retina-m.wts(mobilenet) 转换
 
-### Run
+### Run（参考b2b.cpp：串行retinaface+arcface）
 
-1. download baidu cloud link files and unzip "b2b"
+1. 新开一个线程（为多路检测做准备）读取摄像头或视频流（opencv等工具），可将通道号等信息与视频帧用结构体打包，用于解析和显示，在主线程获取子线程读到的帧（结构体）进行推理。
+
+2. 主线程串行retinaface+arcface
+
+   2.1 构建engine和执行上下文
+
+   ```
+   IRuntime* runtime = createInferRuntime(gLogger);
+   ICudaEngine* engine = runtime->deserializeCudaEngine(trtModelStream_D, size_D);
+   IExecutionContext* context = engine->createExecutionContext();
+   ```
+
+   2.2 视频帧转为输入data格式
+
+   ```
+   static float data[BATCH_SIZE * 3 * INPUT_H_D * INPUT_W_D];
+   for (int b = 0; b < BATCH_SIZE; b++) {
+        float *p_data = &data[b * 3 * INPUT_H_D * INPUT_W_D];
+        for (int i = 0; i < INPUT_H_D * INPUT_W_D; i++) {
+            p_data[i] = pr_img.at<cv::Vec3b>(i)[0] - 104.0;
+            p_data[i + INPUT_H_D * INPUT_W_D] = pr_img.at<cv::Vec3b>(i)[1] - 117.0;
+            p_data[i + 2 * INPUT_H_D * INPUT_W_D] = pr_img.at<cv::Vec3b>(i)[2] - 123.0;
+            }
+   	}
+   ```
+
+   2.3 inference函数
+
+   通用
+
+   ```
+   const ICudaEngine& engine = context.getEngine();
+   IExecutionContext* context = engine->createExecutionContext();
+   context->destroy();
+   //call TensorRT’s enqueue method to start inference asynchronously using a CUDA stream
+   context.enqueue(batchSize, buffers, stream, nullptr);
+   ```
+
+   本文
+
+   ```
+   void doInference_D(IExecutionContext& context, float* input, float* output, int batchSize) {
+       const ICudaEngine& engine = context.getEngine();
+       assert(engine.getNbBindings() == 2);
+       void* buffers[2];
+       const int inputIndex = engine.getBindingIndex(INPUT_BLOB_NAME_D);
+       const int outputIndex = engine.getBindingIndex(OUTPUT_BLOB_NAME_D);
+   
+       // Create GPU buffers on device
+       CHECK(cudaMalloc(&buffers[inputIndex], batchSize * 3 * INPUT_H_D * INPUT_W_D * sizeof(float)));
+       CHECK(cudaMalloc(&buffers[outputIndex], batchSize * OUTPUT_SIZE_D * sizeof(float)));
+   
+       // Create stream
+       cudaStream_t stream;
+       CHECK(cudaStreamCreate(&stream));
+   
+       // DMA input batch data to device, infer on the batch asynchronously, and DMA output back to host
+       CHECK(cudaMemcpyAsync(buffers[inputIndex], input, batchSize * 3 * INPUT_H_D * INPUT_W_D * sizeof(float), cudaMemcpyHostToDevice, stream));
+       context.enqueue(batchSize, buffers, stream, nullptr);
+       CHECK(cudaMemcpyAsync(output, buffers[outputIndex], batchSize * OUTPUT_SIZE_D * sizeof(float), cudaMemcpyDeviceToHost, stream));
+       cudaStreamSynchronize(stream);
+   
+       // Release stream and buffers
+       cudaStreamDestroy(stream);
+       CHECK(cudaFree(buffers[inputIndex]));
+       CHECK(cudaFree(buffers[outputIndex]));
+   }
+   
+   ```
+
+   2.4 推理封装 通过向context(由engine反序列化的执行上下文)输入data(处理好的数据)返回prob(网络输出)
+
+   ```
+   static float prob[BATCH_SIZE * OUTPUT_SIZE_D;
+   doInference_D(*context, data, prob, BATCH_SIZE);
+   ```
+
+3. 通过解析prob对原视频帧进行可视化处理
+
+   ```
+   cv::circle/cv::rectangle/cv::putText
+   ```
+
+4. 显示及保存
+
+   ```
+   cv::imshow ~;
+   cv::VideoWriter ~;
+   ```
+
+   
+
+### Run（source code ：本文代码）
+
+1. download baidu cloud link files and unzip "b2b"（下载source code）
 
 2. 
 
@@ -245,4 +339,3 @@ retina_mnet.engine 由 retina-m.wts(mobilenet) 转换
 3. 将arcface-mobilefacenet.engine及retina_mnet.engine放到build目录下
 
 4. ./b2b -d
-
